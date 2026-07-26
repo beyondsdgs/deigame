@@ -507,10 +507,21 @@ function compute(activeIds, policyIds){
    状態
 ========================================================= */
 const LS="dei-sim-v2";
+/* 保存先は sessionStorage。同じタブ内のリロードでは選択内容が復帰し、
+   リンクを開き直す（＝新しいタブ／セッション）と必ず2名選択から始まる。 */
+try{ localStorage.removeItem(LS); }catch(e){} // 旧版がlocalStorageに残した状態を掃除
+/* URLに ?reset が付いていれば保存状態を破棄し、必ず2名選択から始める。
+   直後にパラメータをURLから取り除くため、以降のリロードでは通常どおり復帰する。 */
+try{
+  if(new URLSearchParams(location.search).has("reset")){
+    sessionStorage.removeItem(LS);
+    history.replaceState(null,"",location.pathname);
+  }
+}catch(e){}
 let state={phase:"A", picks:[], active:[], policies:[], tab:"policy", fA:"all", fP:"all", fM:"all"};
-try{ const s=JSON.parse(localStorage.getItem(LS)); if(s&&s.phase) state=Object.assign(state,s); }catch(e){}
+try{ const s=JSON.parse(sessionStorage.getItem(LS)); if(s&&s.phase) state=Object.assign(state,s); }catch(e){}
 if(state.tab==="org") state.tab="policy";
-const save=()=>{ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} };
+const save=()=>{ try{ sessionStorage.setItem(LS, JSON.stringify(state)); }catch(e){} };
 let q={A:"",P:"",M:""}; // 検索語（保存しない）
 
 /* =========================================================
