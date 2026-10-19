@@ -76,18 +76,20 @@
   .cover-row .vb{width:24px; height:24px;}
   .cover-none{font-size:.78rem; color:#B9AE9F; font-weight:700;}
   /* ===== タブ（押しボタン風） ===== */
-  .tabs{display:flex; gap:10px; margin:8px 0 8px;}
+  /* 3分割。「ソリューション」が7文字あるため、文字を詰めて折り返さないようにする */
+  .tabs{display:flex; gap:6px; margin:8px 0 8px;}
   .tab{
-    flex:1; min-height:48px; border-radius:14px;
+    flex:1; min-width:0; min-height:48px; border-radius:14px;
     border:2.5px solid #D9CBB4;
     background:linear-gradient(#FFFFFF,#F4EBDC);
     box-shadow:0 4px 0 #D9CBB4, 0 6px 10px rgba(160,110,60,.12);
-    font-size:.9rem; font-weight:900; cursor:pointer; position:relative;
-    display:flex; flex-direction:row; align-items:center; justify-content:center; gap:6px;
+    font-size:.66rem; font-weight:900; cursor:pointer; position:relative;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
     transition:transform .05s ease, box-shadow .05s ease;
+    padding:0 1px; overflow:hidden;
   }
-  .tab .ic{font-size:1.15rem; line-height:1;}
-  .tab .tl{display:flex; align-items:center; line-height:1.2; white-space:nowrap;}
+  .tab .ic{font-size:1.05rem; line-height:1.1;}
+  .tab .tl{display:flex; align-items:center; line-height:1.15; white-space:nowrap;}
   .tab:active{transform:translateY(3px); box-shadow:0 1px 0 #D9CBB4;}
   .tab[aria-selected="true"]{
     background:var(--grad); border-color:#C23B54; color:#fff;
@@ -98,8 +100,8 @@
     border:7px solid transparent; border-top-color:#C23B54;
   }
   .tab .cnt{
-    display:inline-block; min-width:22px; padding:0 6px; margin-left:5px; border-radius:999px;
-    background:var(--c-U); color:#fff; font-size:.78rem; line-height:22px;
+    display:inline-block; min-width:18px; padding:0 4px; margin-left:4px; border-radius:999px;
+    background:var(--c-U); color:#fff; font-size:.68rem; line-height:18px;
   }
   .tab[aria-selected="true"] .cnt{background:#fff; color:var(--c-U);}
   /* 固定領域を圧迫していたため非表示。切替の説明は各画面の
@@ -277,6 +279,65 @@
     position:sticky; bottom:0; display:block; width:100%; min-height:50px; margin-top:14px;
     background:var(--ink); color:#fff; border:none; border-radius:14px; font-size:1rem; font-weight:900; cursor:pointer;
   }
+  /* ===== おかね（借金台帳） ===== */
+  .m-box{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:14px; margin-bottom:12px;}
+  .period-row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;}
+  .period-now{font-size:1.05rem; font-weight:900;}
+  .btn-step{
+    border:2px solid #D9CBB4; background:linear-gradient(#FFFFFF,#F4EBDC);
+    border-radius:12px; min-height:44px; padding:0 14px; font-weight:900; font-size:.88rem; cursor:pointer;
+  }
+  .btn-step:active{transform:translateY(1px);}
+  .btn-step:disabled{opacity:.4; cursor:not-allowed;}
+  .debt-main{text-align:center; padding:10px 0 4px;}
+  .debt-main .lab{font-size:.8rem; color:var(--sub); font-weight:800;}
+  .debt-main .val{font-size:2.4rem; font-weight:900; line-height:1.1; color:var(--risk);}
+  .debt-main .val.zero{color:var(--safe);}
+  .debt-main .sub{font-size:.9rem; font-weight:800; color:var(--sub); margin-top:2px;}
+  .debt-cap{font-size:.78rem; color:var(--sub); margin-top:4px;}
+  .step-row{display:flex; align-items:center; gap:8px; margin-top:14px;}
+  .step-row .nm{flex:0 0 52px; font-size:.88rem; font-weight:900;}
+  .stepper{display:flex; align-items:center; gap:6px;}
+  .stepper .btn-step{min-width:44px; padding:0; font-size:1.2rem;}
+  .stepper .amt{min-width:46px; text-align:center; font-size:1.2rem; font-weight:900;}
+  .btn-act{
+    flex:1; min-width:0; min-height:46px; border:none; border-radius:12px; cursor:pointer;
+    font-size:.78rem; font-weight:900; color:#fff; white-space:nowrap; padding:0 4px;
+  }
+  .btn-act.borrow{background:var(--c-K);}
+  .btn-act.repay{background:var(--safe);}
+  .btn-act:disabled{background:#D8CCBB; cursor:not-allowed;}
+  .bal-row{display:flex; justify-content:space-between; align-items:baseline; padding:6px 0; font-size:.92rem;}
+  .bal-row .v{font-weight:900; font-size:1.05rem;}
+  .bal-row .memo{font-size:.76rem; color:var(--sub); font-weight:700;}
+  .bal-row.total{border-top:1.5px dashed var(--line); margin-top:4px; padding-top:9px;}
+  .bal-row.total .v{font-size:1.3rem;}
+  .plus{color:var(--safe);} .minus{color:var(--risk);}
+  .warn{background:var(--risk-bg); border:1.5px solid var(--risk); border-radius:12px; padding:10px 13px; font-size:.86rem; font-weight:800; color:var(--risk); margin-top:10px;}
+  .log-row{display:flex; justify-content:space-between; font-size:.85rem; padding:4px 0; border-bottom:1px dotted var(--line);}
+  .log-row .amt{font-weight:900;}
+
+  /* ===== 能力アップ演出 ===== */
+  .fx-pop{text-align:center;}
+  .fx-pop h3{font-size:1.1rem; margin:0 0 4px;}
+  .sparkle{font-size:2rem; animation:sp .9s ease-out;}
+  @keyframes sp{0%{transform:scale(.4) rotate(-20deg); opacity:0;} 60%{transform:scale(1.25) rotate(8deg); opacity:1;} 100%{transform:scale(1) rotate(0);} }
+  .up-row{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    background:var(--bg); border-radius:11px; padding:8px 12px; margin-top:7px;
+    animation:slideup .35s ease-out backwards;
+  }
+  @keyframes slideup{from{transform:translateY(8px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+  .up-row .nm{font-weight:800; font-size:.95rem;}
+  .up-row .num{font-weight:900; font-size:1rem; white-space:nowrap;}
+  .up-row .num .to{color:var(--safe); font-size:1.2rem;}
+  .up-row .num .d{color:var(--safe); font-size:.85rem; margin-left:4px;}
+  .why{
+    background:#FFF6DF; border:1.5px solid #EBD08F; border-radius:12px;
+    padding:10px 13px; font-size:.86rem; margin-top:12px; text-align:left; line-height:1.65;
+  }
+  .why b{color:var(--c-L-d);}
+
   /* ===== ブラインド採用 ===== */
   .unknown{font-size:.82rem; font-weight:800; color:#A39684;}
   .sel-card.failed{background:#F6F3EE; border-color:#D6C8B4;}
@@ -441,6 +502,14 @@
       <div id="memList"></div>
     </div>
 
+    <div id="pane-money" role="tabpanel" class="hidden">
+      <details class="acc how">
+        <summary>❓ この画面でできること</summary>
+        <p>コインそのものは手元のまま動かします。この画面は<b>借金の帳簿</b>です。借りるときは<b>2コイン単位</b>、返すときは<b>1.5倍</b>にして返す必要があり、その計算をここで行います（2コイン分の返済なら3コイン払う）。借入は<b>10コインまで</b>。<br>下の「今期の収支めやす」は、収入（チーム仕事力）・ソリューションのコスト・給料（メンバー人数）から自動計算したものです。先に見ておくと、給料が払えずに強制借金になるのを防げます。</p>
+      </details>
+      <div id="moneyPane"></div>
+    </div>
+
     <div class="toolbar">
       <button class="btn-ghost" id="btnClearPol">ソリューションの選択をすべて解除</button>
       <button class="btn-ghost" id="btnReset">🔄 はじめから</button>
@@ -561,10 +630,17 @@ try{
   }
 }catch(e){}
 let state={phase:"A", picks:[], active:[], policies:[], tab:"policy", fA:"all", fP:"all", fM:"all", coverOpen:false,
-           tried:[], order:null};
+           tried:[], order:null,
+           /* おかね。debt は借入の元本で、ルール上つねに偶数（2の倍数）に保たれる。
+              返済に必要なコイン数は debt*1.5 ＝ debt/2*3 で、元本が偶数なので必ず整数になる。
+              period は第1〜5期の暫定管理。ターン管理の本実装はニアカリ側で置き換える想定。 */
+           debt:0, debtLog:[], period:1};
 try{ const s=JSON.parse(sessionStorage.getItem(LS)); if(s&&s.phase) state=Object.assign(state,s); }catch(e){}
 if(state.tab==="org") state.tab="policy";
 if(!Array.isArray(state.tried)) state.tried=[];   // 旧い保存データから復帰した場合の保険
+if(typeof state.debt!=="number") state.debt=0;
+if(!Array.isArray(state.debtLog)) state.debtLog=[];
+if(typeof state.period!=="number") state.period=1;
 const save=()=>{ try{ sessionStorage.setItem(LS, JSON.stringify(state)); }catch(e){} };
 let q={A:"",P:"",M:""}; // 検索語（保存しない）
 
@@ -653,13 +729,17 @@ function renderBoard(){
 function renderTabs(){
   const t=$("tabs");
   if(state.phase==="A"){ t.innerHTML=""; $("tabHint").textContent=""; return; }
-  const defs=[["policy","🃏","ソリューション",state.policies.length],["member","👥","メンバー",state.active.length]];
+  const defs=[
+    ["policy","🃏","ソリューション",state.policies.length],
+    ["member","👥","メンバー",state.active.length],
+    ["money","💰","おかね",state.debt||0]
+  ];
   t.innerHTML=defs.map(([k,ic,label,cnt])=>
     `<button class="tab" role="tab" aria-selected="${state.tab===k}" data-tab="${k}">
       <span class="ic" aria-hidden="true">${ic}</span>
       <span class="tl">${label}${cnt?`<span class="cnt">${cnt}</span>`:""}</span>
     </button>`).join("");
-  $("tabHint").textContent="▲ タップで「ソリューション」と「メンバー」の画面が切りかわります";
+  $("tabHint").textContent="";
   t.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{ state.tab=b.dataset.tab; save(); render(); });
 }
 
@@ -718,8 +798,11 @@ function renderPolicies(){
     b.onclick=(ev)=>{
       if(ev.target.closest("[data-desc]")) return; // 説明ボタンは選択扱いにしない
       const idx=+b.dataset.pol, at=state.policies.indexOf(idx);
+      const before=[...state.policies];               // 演出で変化前の仕事力を出すため控えておく
+      const adding=at<0;
       if(at>=0) state.policies.splice(at,1); else state.policies.push(idx);
       save(); renderBoard(); renderTabs(); renderPolicies();
+      if(adding) showBoost(idx, before);              // 追加したときだけ演出を出す
     };
   });
   $("polList").querySelectorAll("[data-desc]").forEach(b=>{
@@ -762,6 +845,156 @@ function renderMembers(){
   $("memList").querySelectorAll("[data-mem]").forEach(b=>{
     b.onclick=()=>askMember(+b.dataset.mem);
   });
+}
+
+/* =========================================================
+   能力アップ演出と理由テキスト
+   人財80人×ソリューション37枚＝2960通りを手書きするのは現実的でないため、
+   「どの価値観に効いたか」から価値観ごとの定型文で理由を組み立てる。
+========================================================= */
+const WHY = {
+  L:"暮らしの段取りがつき、仕事に向ける時間が増えました。",
+  K:"学ぶ順番が見えて、力の伸び方が変わりました。",
+  G:"言葉や文化の壁が下がり、持っていた力が通じるようになりました。",
+  U:"自分のままで働けるようになり、無理に合わせる力を仕事に回せました。",
+  F:"評価の筋が通り、納得して力を出せるようになりました。"
+};
+
+/* 指定のソリューション集合での、ある人財の仕事力を返す */
+function powerOf(member, policyIds){
+  let p=member.base;
+  policyIds.forEach(i=>{ const pol=POLICIES[i]; if(member.icons.some(ic=>pol.icons.includes(ic))) p+=pol.boost; });
+  return p;
+}
+
+/* ソリューションを1枚足したときの演出。上がった人がいなければ何も出さない */
+function showBoost(polIdx, beforePolicies){
+  const pol=POLICIES[polIdx];
+  if(pol.boost<=0) return false;
+  const ups=[];
+  state.active.forEach(id=>{
+    const m=MEMBERS[id];
+    if(!m.icons.some(ic=>pol.icons.includes(ic))) return;
+    ups.push({m, from:powerOf(m,beforePolicies), to:powerOf(m,state.policies)});
+  });
+  if(!ups.length) return false;
+  // 効いた価値観（ソリューションと人財の価値観の重なり）を集める
+  const hitIc=[...new Set(ups.flatMap(u=>u.m.icons.filter(ic=>pol.icons.includes(ic))))];
+  const names=sortIc(hitIc).map(ic=>`〈${META[ic].label}〉`).join("と");
+  openAsk(`<div class="fx-pop">
+      <div class="sparkle" aria-hidden="true">✨</div>
+      <h3>${ups.length}人の仕事力が上がりました</h3>
+      ${ups.map((u,i)=>`<div class="up-row" style="animation-delay:${i*0.07}s">
+        <span class="nm">${esc(u.m.name)}</span>
+        <span class="num">${u.from} → <span class="to">${u.to}</span><span class="d">+${u.to-u.from}</span></span>
+      </div>`).join("")}
+      <div class="why">「<b>${esc(pol.name)}</b>」が${names}に効きました。<br>${WHY[sortIc(hitIc)[0]]}</div>
+      <div class="ask-btns"><button class="btn-primary" data-ask="close">とじる</button></div>
+    </div>`);
+  return true;
+}
+
+/* =========================================================
+   おかね（借金台帳）
+   ルール（260905_DEI経営ゲーム.pptx より）
+   - 借入は2の倍数、上限10コイン
+   - 返済は借入額の1.5倍（2借りたら3返す）。部分返済可
+   - 給料が払えない場合は強制借金（不足分を2の倍数に切り上げ）
+   - 第5期終了時に返済できなければ敗北
+   収入＝チーム仕事力 / 給料＝メンバー人数 / ソリューションのコストは compute() の coins
+========================================================= */
+const DEBT_MAX=10;                 // 借入上限
+const repayCost=n=>n/2*3;          // 元本nコインを返すのに必要なコイン数（元本は常に偶数）
+let borrowAmt=2, repayAmt=2;       // ステッパーの選択値（保存しない）
+
+function renderMoney(){
+  const r=compute(state.active,state.policies);
+  const debt=state.debt, canBorrow=DEBT_MAX-debt;
+  borrowAmt=Math.min(Math.max(borrowAmt,2),Math.max(canBorrow,2));
+  repayAmt=Math.min(Math.max(repayAmt,2),Math.max(debt,2));
+  const income=r.totalPower, salary=r.memberCount, cost=r.coins;
+  const net=income-salary-cost;
+  const isLast=state.period>=5;
+
+  $("moneyPane").innerHTML=`
+    <div class="m-box">
+      <div class="period-row">
+        <span class="period-now">第 ${state.period} 期</span>
+        <span>
+          <button class="btn-step" id="btnPrevP" ${state.period<=1?"disabled":""}>← 前の期</button>
+          <button class="btn-step" id="btnNextP" ${isLast?"disabled":""}>次の期 →</button>
+        </span>
+      </div>
+      <div class="debt-main">
+        <div class="lab">いまの借金</div>
+        <div class="val${debt===0?" zero":""}">${debt} <span style="font-size:1rem">コイン</span></div>
+        ${debt>0?`<div class="sub">返済には <b>${repayCost(debt)}</b> コイン必要</div>`:`<div class="sub">借金はありません</div>`}
+        <div class="debt-cap">あと ${canBorrow} コインまで借りられます（上限${DEBT_MAX}）</div>
+      </div>
+
+      <div class="step-row">
+        <span class="nm">借りる</span>
+        <span class="stepper">
+          <button class="btn-step" id="bMinus" ${borrowAmt<=2?"disabled":""}>−</button>
+          <span class="amt">${canBorrow>0?borrowAmt:0}</span>
+          <button class="btn-step" id="bPlus" ${borrowAmt+2>canBorrow?"disabled":""}>＋</button>
+        </span>
+        <button class="btn-act borrow" id="btnBorrow" ${canBorrow<=0?"disabled":""}>
+          ${canBorrow<=0?"上限です":`${borrowAmt}コイン借りる`}
+        </button>
+      </div>
+
+      <div class="step-row">
+        <span class="nm">返す</span>
+        <span class="stepper">
+          <button class="btn-step" id="rMinus" ${repayAmt<=2?"disabled":""}>−</button>
+          <span class="amt">${debt>0?repayAmt:0}</span>
+          <button class="btn-step" id="rPlus" ${repayAmt+2>debt?"disabled":""}>＋</button>
+        </span>
+        <button class="btn-act repay" id="btnRepay" ${debt<=0?"disabled":""}>
+          ${debt<=0?"返済なし":`${repayCost(repayAmt)}払って${repayAmt}返す`}
+        </button>
+      </div>
+
+      ${isLast&&debt>0?`<div class="warn">⚠️ 第5期です。ゲーム終了時に返済できないと敗北になります。返済にあと ${repayCost(debt)} コイン必要です。</div>`:""}
+    </div>
+
+    <div class="m-box">
+      <h3 style="font-size:.95rem; margin:0 0 8px;">今期の収支めやす</h3>
+      <div class="bal-row"><span>収入<span class="memo"> チーム仕事力</span></span><span class="v plus">+${income}</span></div>
+      <div class="bal-row"><span>ソリューション<span class="memo"> ${state.policies.length}枚</span></span><span class="v ${cost?"minus":""}">−${cost}</span></div>
+      <div class="bal-row"><span>給料<span class="memo"> メンバー${salary}人</span></span><span class="v minus">−${salary}</span></div>
+      <div class="bal-row total"><span>差引</span><span class="v ${net<0?"minus":"plus"}">${net>=0?"+":""}${net}</span></div>
+      ${net<0?`<div class="warn">このままだと ${-net} コイン不足する見込みです。足りなければ強制借金になります（${Math.ceil(-net/2)*2}コイン）。</div>`:""}
+      <p class="debt-cap">※ 昇進のコストは含んでいません。別に数えてください。</p>
+    </div>
+
+    ${state.debtLog.length?`<div class="m-box">
+      <h3 style="font-size:.95rem; margin:0 0 6px;">借入・返済の記録</h3>
+      ${state.debtLog.map(l=>`<div class="log-row"><span>第${l.period}期</span><span class="amt ${l.amount>0?"minus":"plus"}">${l.amount>0?"+":""}${l.amount}</span></div>`).join("")}
+    </div>`:""}
+  `;
+
+  const re=()=>{ save(); renderTabs(); renderMoney(); };
+  $("bMinus").onclick=()=>{ borrowAmt=Math.max(2,borrowAmt-2); renderMoney(); };
+  $("bPlus").onclick =()=>{ borrowAmt=Math.min(canBorrow,borrowAmt+2); renderMoney(); };
+  $("rMinus").onclick=()=>{ repayAmt=Math.max(2,repayAmt-2); renderMoney(); };
+  $("rPlus").onclick =()=>{ repayAmt=Math.min(debt,repayAmt+2); renderMoney(); };
+  $("btnBorrow").onclick=()=>{
+    if(canBorrow<=0) return;
+    state.debt+=borrowAmt;
+    state.debtLog.push({period:state.period, amount:borrowAmt});
+    borrowAmt=2; re();
+  };
+  $("btnRepay").onclick=()=>{
+    if(state.debt<=0) return;
+    const n=Math.min(repayAmt,state.debt);
+    state.debt-=n;
+    state.debtLog.push({period:state.period, amount:-n});
+    repayAmt=2; re();
+  };
+  $("btnPrevP").onclick=()=>{ if(state.period>1){ state.period--; re(); } };
+  $("btnNextP").onclick=()=>{ if(state.period<5){ state.period++; re(); } };
 }
 
 /* ===== 採用チャレンジ ===== */
@@ -815,13 +1048,19 @@ function onAsk(act){
     }
     else if(!state.tried.includes(idx)) state.tried.push(idx);
     save();
+    // 採用できたときは、その人の実際の仕事力とチーム合計の変化も見せる
+    const after=ok?compute(state.active,state.policies).totalPower:0;
+    const mine=ok?powerOf(m,state.policies):0;
     openAsk(`<h3 class="${ok?"ask-ok":"ask-ng"}">${ok?"🎉 この人財を採用できました":"😢 この人財は採用できませんでした"}</h3>
       <p class="ask-name">${esc(m.name)} <span class="kana">${esc(m.kana||"")}</span></p>
       <div class="ask-reveal">
         <div class="vrow">${vbs(m.icons)}</div>
         <div class="meta-row"><span class="pw">仕事力 ${m.base} ${pips(m.base)}</span></div>
       </div>
-      ${ok?"":`<p class="ask-note">この人財の価値観をすべて満たす ${fxChip("recruit")} のソリューションを選べば、あとから採用できます。</p>`}
+      ${ok?`<div class="up-row"><span class="nm">チーム仕事力</span>
+        <span class="num">${r.totalPower} → <span class="to">${after}</span><span class="d">+${after-r.totalPower}</span></span></div>
+        ${mine>m.base?`<div class="why">いま実施中のソリューションが効いて、この人の仕事力は <b>${m.base} → ${mine}</b> になります。</div>`:""}`
+      :`<p class="ask-note">この人財の価値観をすべて満たす ${fxChip("recruit")} のソリューションを選べば、あとから採用できます。</p>`}
       <div class="ask-btns"><button class="btn-primary" data-ask="close">とじる</button></div>`);
     renderBoard(); renderTabs(); renderMembers();
   }
@@ -881,9 +1120,10 @@ function render(){
   $("startBar").classList.toggle("hidden",!isA);
   renderBoard(); renderTabs();
   if(isA){ renderPhaseA(); return; }
-  ["policy","member"].forEach(k=>$("pane-"+k).classList.toggle("hidden",state.tab!==k));
+  ["policy","member","money"].forEach(k=>$("pane-"+k).classList.toggle("hidden",state.tab!==k));
   if(state.tab==="policy") renderPolicies();
   if(state.tab==="member") renderMembers();
+  if(state.tab==="money")  renderMoney();
 }
 
 /* あそびかたモーダル */
@@ -914,7 +1154,7 @@ $("btnClearPol").onclick=()=>{
 $("btnReset").onclick=()=>{
   if(confirm("ゲームをはじめから始めますか？（選択内容はすべてリセットされます）")){
     state={phase:"A",picks:[],active:[],policies:[],tab:"policy",fA:"all",fP:"all",fM:"all",
-           coverOpen:false,tried:[],order:null};
+           coverOpen:false,tried:[],order:null,debt:0,debtLog:[],period:1};
     save(); render(); window.scrollTo(0,0);
   }
 };
