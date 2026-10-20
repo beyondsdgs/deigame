@@ -281,8 +281,17 @@
   }
   /* ===== おかね（借金台帳） ===== */
   .m-box{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:14px; margin-bottom:12px;}
-  .period-row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;}
-  .period-now{font-size:1.05rem; font-weight:900;}
+  /* 1期のお金の流れ。ゲームの5ステップ順に並べ、お金が動くところだけ金額を出す */
+  .flow-row{
+    display:flex; align-items:center; gap:7px; padding:7px 0;
+    border-bottom:1px dotted var(--line); font-size:.9rem;
+  }
+  .flow-row.last{border-bottom:none;}
+  .flow-row .st{flex:0 0 auto; font-weight:900; color:var(--sub);}
+  .flow-row .nm2{flex:0 0 auto; font-weight:800;}
+  .flow-row .memo{flex:1; text-align:right; font-size:.72rem; color:var(--sub); font-weight:700;}
+  .flow-row .v{flex:0 0 auto; font-weight:900; font-size:1.05rem; min-width:34px; text-align:right;}
+  .flow-row .v.non{color:#C3B9AA; font-size:.9rem;}
   .btn-step{
     border:2px solid #D9CBB4; background:linear-gradient(#FFFFFF,#F4EBDC);
     border-radius:12px; min-height:44px; padding:0 14px; font-weight:900; font-size:.88rem; cursor:pointer;
@@ -337,6 +346,20 @@
     padding:10px 13px; font-size:.86rem; margin-top:12px; text-align:left; line-height:1.65;
   }
   .why b{color:var(--c-L-d);}
+  /* どのソリューションが何ポイント効いたかの内訳 */
+  .bd{
+    background:#FFF6DF; border:1.5px solid #EBD08F; border-radius:12px;
+    padding:10px 12px; margin-top:12px; text-align:left;
+  }
+  .bd-h{font-size:.78rem; font-weight:900; color:var(--c-L-d); margin-bottom:4px;}
+  .bd-row{display:flex; align-items:center; gap:6px; padding:5px 0; border-bottom:1px dotted #E3CF9E;}
+  .bd-row:last-child{border-bottom:none;}
+  .bd-nm{flex:1; font-size:.82rem; font-weight:800; line-height:1.35;}
+  .bd-ic{flex:0 0 auto; display:flex; gap:2px;}
+  .bd-v{flex:0 0 auto; font-weight:900; font-size:.95rem; color:var(--safe); min-width:30px; text-align:right;}
+  .bd-row.total{border-top:1.5px solid #E3CF9E; margin-top:3px; padding-top:7px;}
+  .bd-row.total .bd-v{color:var(--ink); font-size:.95rem; min-width:auto;}
+  .bd-row.total .bd-v b{color:var(--safe); font-size:1.2rem;}
 
   /* ===== ブラインド採用 ===== */
   .unknown{font-size:.82rem; font-weight:800; color:#A39684;}
@@ -505,7 +528,7 @@
     <div id="pane-money" role="tabpanel" class="hidden">
       <details class="acc how">
         <summary>❓ この画面でできること</summary>
-        <p>コインそのものは手元のまま動かします。この画面は<b>借金の帳簿</b>です。借りるときは<b>2コイン単位</b>、返すときは<b>1.5倍</b>にして返す必要があり、その計算をここで行います（2コイン分の返済なら3コイン払う）。借入は<b>10コインまで</b>。<br>下の「今期の収支めやす」は、収入（チーム仕事力）・ソリューションのコスト・給料（メンバー人数）から自動計算したものです。先に見ておくと、給料が払えずに強制借金になるのを防げます。</p>
+        <p>コインそのものは手元のまま動かします。この画面は<b>借金の帳簿</b>です。借りるときは<b>2コイン単位</b>、返すときは<b>1.5倍</b>にして返す必要があり、その計算をここで行います（2コイン分の返済なら3コイン払う）。借入は<b>10コインまで</b>。<br>下の「1期のお金の流れ」は、ゲームの5ステップの順に並べてあります。金額が出るのは<b>①収入</b>（チーム仕事力）と<b>⑤給料</b>（メンバー人数）の2つだけで、ソリューションと昇進はその場で支払うためここには出しません。⑤で給料が払えないときに強制借金してください。</p>
       </details>
       <div id="moneyPane"></div>
     </div>
@@ -633,14 +656,14 @@ let state={phase:"A", picks:[], active:[], policies:[], tab:"policy", fA:"all", 
            tried:[], order:null,
            /* おかね。debt は借入の元本で、ルール上つねに偶数（2の倍数）に保たれる。
               返済に必要なコイン数は debt*1.5 ＝ debt/2*3 で、元本が偶数なので必ず整数になる。
-              period は第1〜5期の暫定管理。ターン管理の本実装はニアカリ側で置き換える想定。 */
-           debt:0, debtLog:[], period:1};
+              期（ターン）の管理は持たない。ターン管理はニアカリ側の担当。 */
+           debt:0, debtLog:[]};
 try{ const s=JSON.parse(sessionStorage.getItem(LS)); if(s&&s.phase) state=Object.assign(state,s); }catch(e){}
 if(state.tab==="org") state.tab="policy";
 if(!Array.isArray(state.tried)) state.tried=[];   // 旧い保存データから復帰した場合の保険
 if(typeof state.debt!=="number") state.debt=0;
 if(!Array.isArray(state.debtLog)) state.debtLog=[];
-if(typeof state.period!=="number") state.period=1;
+delete state.period;   // 旧版で保存された期の情報が残っていても捨てる
 const save=()=>{ try{ sessionStorage.setItem(LS, JSON.stringify(state)); }catch(e){} };
 let q={A:"",P:"",M:""}; // 検索語（保存しない）
 
@@ -867,6 +890,37 @@ function powerOf(member, policyIds){
   return p;
 }
 
+/* その人財に効いているソリューションの内訳。
+   どのソリューションが、どの価値観に、何ポイント効いたかを一覧にする */
+function boostBreakdown(member, policyIds){
+  const rows=[];
+  policyIds.forEach(i=>{
+    const pol=POLICIES[i];
+    const hit=member.icons.filter(ic=>pol.icons.includes(ic));
+    if(!hit.length||pol.boost<=0) return;
+    rows.push({name:pol.name, icons:sortIc(hit), boost:pol.boost});
+  });
+  return rows;
+}
+
+/* 内訳のHTML。効いているものが無ければ空文字を返す */
+function breakdownHtml(member, policyIds, base, now){
+  const rows=boostBreakdown(member, policyIds);
+  if(!rows.length) return "";
+  return `<div class="bd">
+    <div class="bd-h">効いているソリューション</div>
+    ${rows.map(x=>`<div class="bd-row">
+      <span class="bd-nm">${esc(x.name)}</span>
+      <span class="bd-ic">${x.icons.map(ic=>vb(ic,20)).join("")}</span>
+      <span class="bd-v">+${x.boost}</span>
+    </div>`).join("")}
+    <div class="bd-row total">
+      <span class="bd-nm">この人の仕事力</span>
+      <span class="bd-v">${base} → <b>${now}</b></span>
+    </div>
+  </div>`;
+}
+
 /* ソリューションを1枚足したときの演出。上がった人がいなければ何も出さない */
 function showBoost(polIdx, beforePolicies){
   const pol=POLICIES[polIdx];
@@ -912,19 +966,10 @@ function renderMoney(){
   const debt=state.debt, canBorrow=DEBT_MAX-debt;
   borrowAmt=Math.min(Math.max(borrowAmt,2),Math.max(canBorrow,2));
   repayAmt=Math.min(Math.max(repayAmt,2),Math.max(debt,2));
-  const income=r.totalPower, salary=r.memberCount, cost=r.coins;
-  const net=income-salary-cost;
-  const isLast=state.period>=5;
+  const income=r.totalPower, salary=r.memberCount;
 
   $("moneyPane").innerHTML=`
     <div class="m-box">
-      <div class="period-row">
-        <span class="period-now">第 ${state.period} 期</span>
-        <span>
-          <button class="btn-step" id="btnPrevP" ${state.period<=1?"disabled":""}>← 前の期</button>
-          <button class="btn-step" id="btnNextP" ${isLast?"disabled":""}>次の期 →</button>
-        </span>
-      </div>
       <div class="debt-main">
         <div class="lab">いまの借金</div>
         <div class="val${debt===0?" zero":""}">${debt} <span style="font-size:1rem">コイン</span></div>
@@ -956,22 +1001,24 @@ function renderMoney(){
         </button>
       </div>
 
-      ${isLast&&debt>0?`<div class="warn">⚠️ 第5期です。ゲーム終了時に返済できないと敗北になります。返済にあと ${repayCost(debt)} コイン必要です。</div>`:""}
+      ${debt>0?`<div class="warn">⚠️ ゲーム終了時に返済できないと敗北になります。全額返すには ${repayCost(debt)} コイン必要です。</div>`:""}
     </div>
 
     <div class="m-box">
-      <h3 style="font-size:.95rem; margin:0 0 8px;">今期の収支めやす</h3>
-      <div class="bal-row"><span>収入<span class="memo"> チーム仕事力</span></span><span class="v plus">+${income}</span></div>
-      <div class="bal-row"><span>ソリューション<span class="memo"> ${state.policies.length}枚</span></span><span class="v ${cost?"minus":""}">−${cost}</span></div>
-      <div class="bal-row"><span>給料<span class="memo"> メンバー${salary}人</span></span><span class="v minus">−${salary}</span></div>
-      <div class="bal-row total"><span>差引</span><span class="v ${net<0?"minus":"plus"}">${net>=0?"+":""}${net}</span></div>
-      ${net<0?`<div class="warn">このままだと ${-net} コイン不足する見込みです。足りなければ強制借金になります（${Math.ceil(-net/2)*2}コイン）。</div>`:""}
-      <p class="debt-cap">※ 昇進のコストは含んでいません。別に数えてください。</p>
+      <h3 style="font-size:.95rem; margin:0 0 4px;">1期のお金の流れ</h3>
+      <p class="debt-cap" style="margin:0 0 8px;">いまのメンバーと仕事力で計算した金額です。</p>
+      <div class="flow-row"><span class="st">①</span><span class="nm2">収入</span><span class="memo">チーム仕事力 ${income}</span><span class="v plus">+${income}</span></div>
+      <div class="flow-row"><span class="st">②</span><span class="nm2">ソリューション</span><span class="memo">買うときに支払い</span><span class="v non">—</span></div>
+      <div class="flow-row"><span class="st">③</span><span class="nm2">離職</span><span class="memo">サイコロ判定</span><span class="v non">—</span></div>
+      <div class="flow-row"><span class="st">④</span><span class="nm2">採用・昇進</span><span class="memo">昇進させるときに支払い</span><span class="v non">—</span></div>
+      <div class="flow-row last"><span class="st">⑤</span><span class="nm2">給料</span><span class="memo">メンバー ${salary}人 × 1</span><span class="v minus">−${salary}</span></div>
+      <p class="debt-cap" style="margin-top:9px;">⑤の給料が払えないときは、上の「借りる」で強制借金してください。</p>
     </div>
 
     ${state.debtLog.length?`<div class="m-box">
       <h3 style="font-size:.95rem; margin:0 0 6px;">借入・返済の記録</h3>
-      ${state.debtLog.map(l=>`<div class="log-row"><span>第${l.period}期</span><span class="amt ${l.amount>0?"minus":"plus"}">${l.amount>0?"+":""}${l.amount}</span></div>`).join("")}
+      ${state.debtLog.map(l=>`<div class="log-row"><span>${l.amount>0?"借入":"返済"}</span><span class="amt ${l.amount>0?"minus":"plus"}">${l.amount>0?"+":""}${l.amount}</span></div>`).join("")}
+      <div class="log-row" style="border:none; font-weight:900;"><span>いまの借金</span><span class="amt">${debt}</span></div>
     </div>`:""}
   `;
 
@@ -983,18 +1030,16 @@ function renderMoney(){
   $("btnBorrow").onclick=()=>{
     if(canBorrow<=0) return;
     state.debt+=borrowAmt;
-    state.debtLog.push({period:state.period, amount:borrowAmt});
+    state.debtLog.push({amount:borrowAmt});
     borrowAmt=2; re();
   };
   $("btnRepay").onclick=()=>{
     if(state.debt<=0) return;
     const n=Math.min(repayAmt,state.debt);
     state.debt-=n;
-    state.debtLog.push({period:state.period, amount:-n});
+    state.debtLog.push({amount:-n});
     repayAmt=2; re();
   };
-  $("btnPrevP").onclick=()=>{ if(state.period>1){ state.period--; re(); } };
-  $("btnNextP").onclick=()=>{ if(state.period<5){ state.period++; re(); } };
 }
 
 /* ===== 採用チャレンジ ===== */
@@ -1059,7 +1104,7 @@ function onAsk(act){
       </div>
       ${ok?`<div class="up-row"><span class="nm">チーム仕事力</span>
         <span class="num">${r.totalPower} → <span class="to">${after}</span><span class="d">+${after-r.totalPower}</span></span></div>
-        ${mine>m.base?`<div class="why">いま実施中のソリューションが効いて、この人の仕事力は <b>${m.base} → ${mine}</b> になります。</div>`:""}`
+        ${breakdownHtml(m, state.policies, m.base, mine)}`
       :`<p class="ask-note">この人財の価値観をすべて満たす ${fxChip("recruit")} のソリューションを選べば、あとから採用できます。</p>`}
       <div class="ask-btns"><button class="btn-primary" data-ask="close">とじる</button></div>`);
     renderBoard(); renderTabs(); renderMembers();
@@ -1154,7 +1199,7 @@ $("btnClearPol").onclick=()=>{
 $("btnReset").onclick=()=>{
   if(confirm("ゲームをはじめから始めますか？（選択内容はすべてリセットされます）")){
     state={phase:"A",picks:[],active:[],policies:[],tab:"policy",fA:"all",fP:"all",fM:"all",
-           coverOpen:false,tried:[],order:null,debt:0,debtLog:[],period:1};
+           coverOpen:false,tried:[],order:null,debt:0,debtLog:[]};
     save(); render(); window.scrollTo(0,0);
   }
 };
